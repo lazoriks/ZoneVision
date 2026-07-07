@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: zonevision-backend
+  datasource:
+    url: jdbc:h2:mem:zonevision;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  otlp:
+    metrics:
+      export:
+        # Disabled by default so the app runs with no external dependency.
+        # Set OTEL_METRICS_ENABLED=true and point OTEL_EXPORTER_OTLP_ENDPOINT
+        # at your Dynatrace OTLP ingest URL (plus DYNATRACE_API_TOKEN) to
+        # push zonevision.* metrics to Grail as business events.
+        enabled: ${OTEL_METRICS_ENABLED:false}
+        url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/metrics}
+        headers:
+          Authorization: ${DYNATRACE_API_TOKEN:}
+        step: 10s
+
+zonevision:
+  cors:
+    allowed-origin: ${DASHBOARD_ORIGIN:http://localhost:5173}
